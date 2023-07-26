@@ -2,25 +2,24 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 )
 
-func NewSlice(capacity int) *Slice {
-	slice := &Slice{}
+func NewSlice(capacity int) *Slice[any] {
+	slice := &Slice[any]{}
 	return slice.init(capacity)
 }
 
-type Slice struct {
-	arr  []int
+type Slice[T any] struct {
+	arr  []T
 	size int
 }
 
-func (s *Slice) init(capacity int) *Slice {
-	s.arr = make([]int, 0, capacity)
+func (s *Slice[T]) init(capacity int) *Slice[T] {
+	s.arr = make([]T, 0, capacity)
 	return s
 }
 
-func (s *Slice) Append(elems ...int) {
+func (s *Slice[T]) Append(elems ...T) {
 	capacity := cap(s.arr)
 	addLength := len(elems)
 	s.size = addLength + s.size
@@ -32,7 +31,7 @@ func (s *Slice) Append(elems ...int) {
 	s.arr = append(s.arr, elems...)
 }
 
-func (s *Slice) Insert(key, value int) {
+func (s *Slice[T]) Insert(key int, value T) {
 	if key < 0 || key >= s.size {
 		panic("数组越界")
 	}
@@ -42,7 +41,7 @@ func (s *Slice) Insert(key, value int) {
 	if s.size > capacity {
 		s.expansion(capacity)
 	}
-	s.arr = append(s.arr, 0)
+	s.arr = append(s.arr, value)
 
 	for i := s.size - 2; i >= key; i-- {
 		s.arr[i+1] = s.arr[i]
@@ -50,21 +49,21 @@ func (s *Slice) Insert(key, value int) {
 	s.arr[key] = value
 }
 
-func (s *Slice) Update(key, value int) {
+func (s *Slice[T]) Update(key int, value T) {
 	if key < 0 || key >= s.size {
 		panic("数组越界")
 	}
 	s.arr[key] = value
 }
 
-func (s *Slice) Get(key int) int {
+func (s *Slice[T]) Get(key int) T {
 	if key < 0 || key >= s.size {
 		panic("数组越界")
 	}
 	return s.arr[key]
 }
 
-func (s *Slice) RemoveByIndex(index int) {
+func (s *Slice[T]) RemoveByIndex(index int) {
 	if index < 0 || index >= s.size {
 		panic("数组越界")
 	}
@@ -77,21 +76,21 @@ func (s *Slice) RemoveByIndex(index int) {
 	s.shrinkage()
 }
 
-func (s *Slice) RemoveLast() {
+func (s *Slice[T]) RemoveLast() {
 	s.RemoveByIndex(s.size - 1)
 }
 
-func (s *Slice) RemoveFirst() {
+func (s *Slice[T]) RemoveFirst() {
 	s.RemoveByIndex(0)
 }
 
-func (s *Slice) Len() int {
+func (s *Slice[T]) Len() int {
 	return s.size
 }
 
 // 扩容方式本来向参考1.18版本之后append扩容源码的代码
 // 但我看还涉及到内存对齐，所以这里统一就按照2倍处理了，这样也方便了缩容计算
-func (s *Slice) expansion(oldCap int) {
+func (s *Slice[T]) expansion(oldCap int) {
 	var newCap = 0
 	for newCap < s.size {
 		if newCap == 0 {
@@ -101,20 +100,20 @@ func (s *Slice) expansion(oldCap int) {
 		}
 	}
 
-	tmp := make([]int, 0, newCap)
+	tmp := make([]T, 0, newCap)
 	s.arr = append(tmp, s.arr...)
 }
 
 // 为了防止复杂度震荡，所以采取len=1/4cap时，新cap=旧cap1/2
 // 而不是len=1/2cap时，新cap=旧cap1/2
-func (s *Slice) shrinkage() {
+func (s *Slice[T]) shrinkage() {
 	length := s.size
 	capacity := cap(s.arr)
 
 	// 至少保留2个cap
 	if length == (capacity/4) && (capacity > 2) {
 		newCap := capacity / 2
-		newSlice := make([]int, 0, newCap)
+		newSlice := make([]T, 0, newCap)
 		for i := 0; i < length; i++ {
 			newSlice = append(newSlice, s.arr[i])
 		}
@@ -122,11 +121,11 @@ func (s *Slice) shrinkage() {
 	}
 }
 
-func (s *Slice) String() string {
+func (s *Slice[T]) String() string {
 	res := fmt.Sprintf("Array: size = %d , realSize = %d ,capacity = %d\n", s.size, len(s.arr), cap(s.arr))
 	res += "["
 	for i := 0; i < s.size; i++ {
-		res += strconv.Itoa(s.arr[i])
+		res += fmt.Sprintf("%v", s.arr[i])
 		if i != s.size-1 {
 			res += ", "
 		}
@@ -137,7 +136,9 @@ func (s *Slice) String() string {
 
 func main() {
 	slice := NewSlice(2)
-	slice.Append(1, 2, 3, 4, 5, 6, 7, 8, 9)
+	slice.Append(1.2, 2.3, 3, 4.6, 5, 6, 7, 8, 9)
+	slice.Insert(0, 0)
+	fmt.Println(slice)
 	slice.RemoveLast()
 	slice.RemoveLast()
 	slice.RemoveLast()
