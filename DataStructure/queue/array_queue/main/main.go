@@ -5,18 +5,18 @@ import (
 	"fmt"
 )
 
-func NewQueue(capacity int) *Queue[any] {
-	var queue = &Queue[any]{}
+func NewQueue[T any](capacity int) *Queue[T] {
+	var queue = &Queue[T]{}
 	return queue.init(capacity)
 }
 
 type Queue[T any] struct {
-	arr *trends_array.Slice[any]
+	arr *trends_array.Slice[T]
 }
 
 func (q *Queue[T]) init(capacity int) *Queue[T] {
 	return &Queue[T]{
-		arr: trends_array.NewSlice(capacity),
+		arr: trends_array.NewSlice[T](capacity),
 	}
 }
 
@@ -28,12 +28,8 @@ func (q *Queue[T]) Dequeue() (res T) {
 	if q.IsEmpty() {
 		return
 	}
-	front, ok := q.arr.Get(0).(T)
-	if !ok {
-		return
-	}
+	res = q.arr.Get(0)
 	q.arr.RemoveFirst()
-	res = front
 	return
 }
 
@@ -41,11 +37,7 @@ func (q *Queue[T]) getFront() (res T) {
 	if q.IsEmpty() {
 		return
 	}
-	front, ok := q.arr.Get(0).(T)
-	if !ok {
-		return
-	}
-	res = front
+	res = q.arr.Get(0)
 	return
 }
 
@@ -58,9 +50,9 @@ func (q *Queue[T]) IsEmpty() bool {
 }
 
 func main() {
-	queue := NewQueue(10)
+	queue := NewQueue[int](10)
 	queue.Enqueue(13)
-	queue.Enqueue(1.7)
+	queue.Enqueue(17)
 	fmt.Println(queue.Dequeue())
 	fmt.Println(queue.Dequeue())
 	fmt.Println(queue.Dequeue())

@@ -2,8 +2,8 @@ package trends_array
 
 import "fmt"
 
-func NewSlice(capacity int) *Slice[any] {
-	slice := &Slice[any]{}
+func NewSlice[T any](capacity int) *Slice[T] {
+	slice := &Slice[T]{}
 	return slice.init(capacity)
 }
 
