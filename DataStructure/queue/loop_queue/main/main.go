@@ -89,16 +89,86 @@ func (l *LoopQueue[T]) String() string {
 }
 
 func main() {
-	loop := NewLoopQueue[int](6)
-	for i := 0; i < 6; i++ {
-		loop.Enqueue(i + 1)
-	}
-	fmt.Println(loop.Dequeue())
-	fmt.Println(loop.Dequeue())
-	fmt.Println(loop.front)
-	fmt.Println(loop.tail)
-	fmt.Println(loop.Enqueue(8))
-	fmt.Println(loop.Enqueue(9))
-	fmt.Println(loop.Enqueue(10))
-	fmt.Println(loop)
+	//loop := NewLoopQueue[int](6)
+	//for i := 0; i < 6; i++ {
+	//	loop.Enqueue(i + 1)
+	//}
+	//fmt.Println(loop.Dequeue())
+	//fmt.Println(loop.Dequeue())
+	//fmt.Println(loop.front)
+	//fmt.Println(loop.tail)
+	//fmt.Println(loop.Enqueue(8))
+	//fmt.Println(loop.Enqueue(9))
+	//fmt.Println(loop.Enqueue(10))
+	//fmt.Println(loop)
+	stack := NewStack[int](4)
+	stack.Push(1)
+	stack.Push(3)
+	stack.Push(4)
+	fmt.Println(stack.Pop())
+	stack.Push(5)
+	fmt.Println(stack.Pop())
+	fmt.Println(stack.Pop())
+	fmt.Println(stack.Pop())
+	fmt.Println(stack.Pop())
+	fmt.Println(stack.Pop())
+
 }
+
+func NewStack[T any](size int) *Stack[T] {
+	stack := &Stack[T]{}
+	stack.init(size)
+	return stack
+}
+
+// Stack 用队列实现栈
+type Stack[T any] struct {
+	container *LoopQueue[T]
+}
+
+func (s *Stack[T]) init(size int) *Stack[T] {
+	s.container = NewLoopQueue[T](size)
+	return s
+}
+
+func (s *Stack[T]) Push(value T) bool {
+	if s.container.IsFull() {
+		return false
+	}
+	s.container.Enqueue(value)
+	return true
+}
+
+func (s *Stack[T]) Pop() (res T) {
+	if s.getSize() == 0 {
+		return
+	}
+	tmp := NewLoopQueue[T](s.getSize())
+	for s.getSize() > 1 {
+		tmp.Enqueue(s.container.Dequeue())
+	}
+	res = s.container.Dequeue()
+	s.container = tmp
+	return
+}
+
+func (s *Stack[T]) Peek() (res T) {
+	if s.getSize() == 0 {
+		return
+	}
+	res = s.container.arr[s.container.tail-1]
+	return
+}
+
+func (s *Stack[T]) IsEmpty() bool {
+	return s.getSize() == 0
+}
+
+func (s *Stack[T]) getSize() int {
+	return s.container.Size()
+}
+
+// 1,2,3
+// 1
+// 2 1
+// 312
