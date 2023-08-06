@@ -19,45 +19,34 @@ type LinkList[T any] struct {
 	headPtr *Node[T]
 }
 
-func (l *LinkList[T]) Add(index int, value T) bool {
+func (l *LinkList[T]) add(ptr *Node[T], index int, value T) (*Node[T], bool) {
 	if index < 0 || index > l.size {
-		return false
-	}
-	defer func() {
-		l.size++
-	}()
-
-	node := &Node[T]{
-		Value: value,
-	}
-	if l.size == 0 {
-		l.headPtr = node
-		return true
+		return nil, false
 	} else if index == 0 {
-		tmp := l.headPtr
-		l.headPtr = node
-		node.Next = tmp
-		return true
+		// 代表这就是插入点了，进行插入
+		insertNode := &Node[T]{
+			Value: value,
+			Next:  ptr,
+		}
+		l.size++
+		return insertNode, true
 	} else {
-		return l.recursionAdd(index, l.headPtr, node)
+		node, ok := l.add(ptr.Next, index-1, value)
+		ptr.Next = node
+		return ptr, ok
 	}
 }
-func (l *LinkList[T]) recursionAdd(index int, ptr *Node[T], addNode *Node[T]) bool {
-	if index == 1 {
-		node := ptr.Next
-		ptr.Next = addNode
-		addNode.Next = node
-		return true
-	} else {
-		index--
-		return l.recursionAdd(index, ptr.Next, addNode)
-	}
+func (l *LinkList[T]) AddFirst(value T) (ok bool) {
+	l.headPtr, ok = l.add(l.headPtr, 0, value)
+	return ok
 }
-func (l *LinkList[T]) AddFirst(value T) bool {
-	return l.Add(0, value)
+func (l *LinkList[T]) AddLast(value T) (ok bool) {
+	l.headPtr, ok = l.add(l.headPtr, l.size, value)
+	return ok
 }
-func (l *LinkList[T]) AddLast(value T) bool {
-	return l.Add(l.size, value)
+func (l *LinkList[T]) AddByIndex(index int, value T) (ok bool) {
+	l.headPtr, ok = l.add(l.headPtr, index, value)
+	return ok
 }
 
 func (l *LinkList[T]) Get(index int, ptr *Node[T]) (res T) {
@@ -78,39 +67,31 @@ func (l *LinkList[T]) GetLast() T {
 	return l.Get(l.size-1, l.headPtr)
 }
 
-func (l *LinkList[T]) Del(index int) bool {
-	if index < 0 || index >= l.size {
-		return false
+func (l *LinkList[T]) del(ptr *Node[T], index int) (*Node[T], bool) {
+	if ptr == nil {
+		return ptr, true
 	}
-	defer func() {
-		l.size--
-	}()
-
+	// 注意，如果当index等于0时，会出现负值，但不受印象
+	node, ok := l.del(ptr.Next, index-1)
 	if index == 0 {
-		delNode := l.headPtr
-		l.headPtr = l.headPtr.Next
-		delNode.Next = nil
-		return true
+		l.size--
+		return node, ok
 	} else {
-		return l.recursionDel(index, l.headPtr)
+		ptr.Next = node
+		return ptr, ok
 	}
 }
-func (l *LinkList[T]) DelFirst() bool {
-	return l.Del(0)
+func (l *LinkList[T]) DelFirst() (ok bool) {
+	l.headPtr, ok = l.del(l.headPtr, 0)
+	return
 }
-func (l *LinkList[T]) DelLast() bool {
-	return l.Del(l.size - 1)
+func (l *LinkList[T]) DelLast() (ok bool) {
+	l.headPtr, ok = l.del(l.headPtr, l.size-1)
+	return
 }
-func (l *LinkList[T]) recursionDel(index int, ptr *Node[T]) bool {
-	if index == 1 {
-		delNode := ptr.Next
-		ptr.Next = ptr.Next.Next
-		delNode.Next = nil
-		return true
-	} else {
-		index--
-		return l.recursionDel(index, ptr.Next)
-	}
+func (l *LinkList[T]) DelByIndex(index int) (ok bool) {
+	l.headPtr, ok = l.del(l.headPtr, index)
+	return ok
 }
 
 func (l *LinkList[T]) String() string {
@@ -126,15 +107,18 @@ func (l *LinkList[T]) toString(ptr *Node[T]) string {
 
 func main() {
 	linkList := NewLinkList[string]()
-	linkList.AddLast("1")
 	linkList.AddFirst("2")
+	linkList.AddLast("1")
 	linkList.AddLast("3")
-	linkList.Add(2, "4")
 	fmt.Println(linkList)
-	linkList.Del(2)
+	linkList.AddByIndex(2, "4")
+	fmt.Println(linkList)
+	fmt.Println(linkList.size)
+	linkList.DelByIndex(2)
 	fmt.Println(linkList)
 	linkList.DelFirst()
 	linkList.DelLast()
+	linkList.DelFirst()
 	fmt.Println(linkList)
 	fmt.Println(linkList.size)
 }
