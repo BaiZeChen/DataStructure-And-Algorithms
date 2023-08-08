@@ -2,8 +2,9 @@ package main
 
 import "fmt"
 
+// 时间复杂度 O(nlogn)
 func main() {
-	arr := []int{20, 7, 9, 6, 10, 8, 21, 24, 20}
+	arr := []int{989, 198, 10000, 1, 10, 8, 99, 37, 20}
 	sort := NewMergeSort[int](arr)
 	fmt.Println(sort.Sort())
 }
@@ -21,41 +22,47 @@ type MergeSort[T Ordered] struct {
 }
 
 func (m *MergeSort[T]) Sort() []T {
-	m.sort(0, len(m.arr)-1)
+	// 为了避免每次merge时都开辟空间，这里直接先定义好
+	// 这里做了一下内存开辟的优化
+	copyArr := make([]T, len(m.arr))
+	m.sort(0, len(m.arr)-1, copyArr)
 	return m.arr
 }
 
-func (m *MergeSort[T]) merge(l, middle, r int) {
-	tmp := make([]T, (r-l)+1)
-	copy(tmp, m.arr[l:r+1])
+func (m *MergeSort[T]) merge(l, middle, r int, copyArr []T) {
+	copy(copyArr[l:r+1], m.arr[l:r+1])
 
-	lStart, rStrat := l, middle+1
+	lStart, rStart := l, middle+1
 	for i := l; i <= r; i++ {
 		if lStart > middle {
 			// 代表左边的数组已经没有值了
-			m.arr[i] = tmp[rStrat-l]
-			rStrat++
-		} else if rStrat > r {
-			m.arr[i] = tmp[lStart-l]
+			m.arr[i] = copyArr[rStart]
+			rStart++
+		} else if rStart > r {
+			m.arr[i] = copyArr[lStart]
 			lStart++
-		} else if tmp[lStart-l] < tmp[rStrat-l] {
-			m.arr[i] = tmp[lStart-l]
+		} else if copyArr[lStart] < copyArr[rStart] {
+			m.arr[i] = copyArr[lStart]
 			lStart++
 		} else {
-			m.arr[i] = tmp[rStrat-l]
-			rStrat++
+			m.arr[i] = copyArr[rStart]
+			rStart++
 		}
 	}
 }
 
-func (m *MergeSort[T]) sort(l, r int) {
+func (m *MergeSort[T]) sort(l, r int, copyArr []T) {
 	if l >= r {
 		return
 	}
 
 	middle := (l + r) / 2
-	m.sort(l, middle)
-	m.sort(middle+1, r)
+	m.sort(l, middle, copyArr)
+	m.sort(middle+1, r, copyArr)
 
-	m.merge(l, middle, r)
+	// 这里做一下优化，当middle的值已经小于右边最小的第一个值后，
+	// 就不需要merge了
+	if m.arr[middle] > m.arr[middle+1] {
+		m.merge(l, middle, r, copyArr)
+	}
 }
