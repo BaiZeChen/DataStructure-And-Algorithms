@@ -8,7 +8,7 @@ import (
 
 // 时间复杂度，O(n^2)
 func main() {
-	ints, err := task([]int{2, 3, 1, 4, 5, 10, 7, 8})
+	ints, err := AdvancedSort([]int{2, 3, 1, 4, 5, 10, 7, 8})
 	if err != nil {
 		panic(err)
 	}
@@ -23,7 +23,7 @@ func AdvancedSort(arr []int) ([]int, error) {
 	}
 	for i := 0; i < length-1; i++ {
 		minKey := i
-		for j := i; j < length; j++ {
+		for j := i + 1; j < length; j++ {
 			if arr[minKey] > arr[j] {
 				minKey = j
 			}
