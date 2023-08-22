@@ -44,8 +44,8 @@ func sortV2(arr []int, l, r int) {
 	}
 
 	p := partitionV2(arr, l, r)
-	sortV1(arr, l, p-1)
-	sortV1(arr, p+1, r)
+	sortV2(arr, l, p-1)
+	sortV2(arr, p+1, r)
 }
 
 // 不再默认取第一个下标，而是随机取下标
