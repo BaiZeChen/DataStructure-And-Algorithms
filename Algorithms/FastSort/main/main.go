@@ -6,9 +6,11 @@ import (
 	"math/big"
 )
 
+// 快速排序：
+// 最坏：O(n^2) 概率非常低，平均：O(nlogn)
 func main() {
-	tmp := []int{6, 9, 1, 13, 8, 5, 2}
-	sortV2(tmp, 0, len(tmp)-1)
+	tmp := []int{6, 10, 1, 13, 8, 5, 2, 87, 23, 37}
+	sortV3(tmp, 0, len(tmp)-1)
 	fmt.Println(tmp)
 
 }
@@ -49,7 +51,7 @@ func sortV2(arr []int, l, r int) {
 
 // 不再默认取第一个下标，而是随机取下标
 func partitionV2(arr []int, l, r int) int {
-	result, _ := rand.Int(rand.Reader, big.NewInt(int64((r-1)+1)))
+	result, _ := rand.Int(rand.Reader, big.NewInt(int64((r-l)+1)))
 	seed := int(int64(l) + result.Int64())
 	arr[seed], arr[l] = arr[l], arr[seed]
 
@@ -62,4 +64,40 @@ func partitionV2(arr []int, l, r int) int {
 	}
 	arr[j], arr[l] = arr[l], arr[j]
 	return j
+}
+
+func sortV3(arr []int, l, r int) {
+	if l >= r {
+		return
+	}
+
+	p := partitionV3(arr, l, r)
+	sortV3(arr, l, p-1)
+	sortV3(arr, p+1, r)
+}
+
+// 双路快排
+func partitionV3(arr []int, l, r int) int {
+	result, _ := rand.Int(rand.Reader, big.NewInt(int64((r-l)+1)))
+	seed := int(int64(l) + result.Int64())
+	arr[seed], arr[l] = arr[l], arr[seed]
+
+	// 左边区间：arr[l+1:lte-1]<v  右边区间：arr[gte+1:r] >=v
+	lte, gte := l+1, r
+	for true {
+		for lte <= gte && arr[l] > arr[lte] {
+			lte++
+		}
+		for gte >= lte && arr[l] < arr[gte] {
+			gte--
+		}
+		if lte >= gte {
+			break
+		}
+		arr[lte], arr[gte] = arr[gte], arr[lte]
+		lte++
+		gte--
+	}
+	arr[l], arr[gte] = arr[gte], arr[l]
+	return gte
 }
