@@ -68,15 +68,15 @@ func (l *LinkList[T]) GetLast() T {
 }
 
 func (l *LinkList[T]) del(ptr *Node[T], index int) (*Node[T], bool) {
-	if ptr == nil {
-		return ptr, true
-	}
-	// 注意，如果当index等于0时，会出现负值，但不受印象
-	node, ok := l.del(ptr.Next, index-1)
-	if index == 0 {
+	if index < 0 || index > l.size {
+		return nil, false
+	} else if index == 0 {
+		node := ptr.Next
+		ptr.Next = nil
 		l.size--
-		return node, ok
+		return node, true
 	} else {
+		node, ok := l.del(ptr.Next, index-1)
 		ptr.Next = node
 		return ptr, ok
 	}

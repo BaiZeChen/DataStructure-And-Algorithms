@@ -4,7 +4,7 @@ import "fmt"
 
 // 时间复杂度 O(nlogn)
 func main() {
-	arr := []int{989, 198, 10000, 1, 10, 8, 99, 37, 20}
+	arr := []int{989, 198, 10000, 1, 10, 8, 99, 37, 20, 3, 7, 12}
 	sort := NewMergeSort[int](arr)
 	fmt.Println(sort.Sort())
 }
@@ -55,7 +55,7 @@ func (m *MergeSort[T]) merge(l, middle, r int, copyArr []T) {
 
 // 递归的方式，自顶向下
 func (m *MergeSort[T]) sortRecursion(l, r int, copyArr []T) {
-	if l >= r {
+	if l == r {
 		return
 	}
 

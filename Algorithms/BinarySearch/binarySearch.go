@@ -69,7 +69,3 @@ func Lower(arr []int, target int) int {
 	}
 	return r
 }
-
-func a() {
-
-}
