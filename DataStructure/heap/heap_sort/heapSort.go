@@ -34,7 +34,7 @@ func HeapSort[T Ordered](arr []T) []T {
 			if childIndex > i-1 {
 				break
 			}
-			if childIndex+1 < i-1 && arr[childIndex] < arr[childIndex+1] {
+			if childIndex+1 <= i-1 && arr[childIndex] < arr[childIndex+1] {
 				childIndex++
 			}
 			if arr[tmp] > arr[childIndex] {

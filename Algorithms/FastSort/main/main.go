@@ -117,7 +117,7 @@ func partitionV4(arr []int, l, r int) (int, int) {
 	arr[seed], arr[l] = arr[l], arr[seed]
 
 	lt, index, gt := l, l+1, r+1
-	// 左边区间：arr[l+1:lt]< v 中间区间 arr[lt+1:gte-1]= v  右边区间：arr[gt:r] >v
+	// 左边区间：arr[l+1:lt]< v 中间区间 arr[lt+1:gt-1]= v  右边区间：arr[gt:r] >v
 	for index < gt {
 		if arr[index] < arr[l] {
 			lt++

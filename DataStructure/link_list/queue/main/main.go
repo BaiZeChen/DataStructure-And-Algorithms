@@ -42,7 +42,7 @@ func (q *LinkListQueue[T]) Dequeue() (res T) {
 	}()
 
 	node := q.headPtr
-	q.headPtr = q.headPtr.Next
+	q.headPtr = node.Next
 	node.Next = nil
 	if q.headPtr == nil {
 		// 代表一个也没有了，此时tail也得置为nil
