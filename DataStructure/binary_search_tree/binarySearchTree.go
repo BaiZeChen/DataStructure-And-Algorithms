@@ -166,7 +166,7 @@ func (s *SBT[T]) removeMax(node *Node[T]) *Node[T] {
 	return node
 }
 func (s *SBT[T]) RemoveAny(value T) {
-	s.remove(s.root, value)
+	s.root = s.remove(s.root, value)
 }
 func (s *SBT[T]) remove(node *Node[T], value T) *Node[T] {
 	if node == nil {
@@ -179,9 +179,13 @@ func (s *SBT[T]) remove(node *Node[T], value T) *Node[T] {
 		return node
 	} else {
 		if node.LeftChild == nil {
-			return node.RightChild
+			rightChild := node.RightChild
+			node.RightChild = nil
+			return rightChild
 		} else if node.RightChild == nil {
-			return node.LeftChild
+			leftChild := node.LeftChild
+			node.LeftChild = nil
+			return leftChild
 		} else {
 			// 有两个子结点,这里找后继节点（就是右子树最小的节点）
 			succeedNode := s.FindMin(node.RightChild)
